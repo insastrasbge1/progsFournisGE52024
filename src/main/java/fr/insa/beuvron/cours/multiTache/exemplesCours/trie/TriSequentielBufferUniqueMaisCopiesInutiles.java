@@ -19,49 +19,34 @@
 package fr.insa.beuvron.cours.multiTache.exemplesCours.trie;
 
 /**
- * Un trie "Divide and Conquer" avec l'utilisation d'un buffer unique pour les
- * fusions.
+ * Un trie "Divide and Conquer" avec l'utilisation d'un buffer unique pour
+ * les fusions.
  * <pre>
- * <p> principe : si l'on divise en deux le tableau, que l'on trie les deux
- * moitiées, lorsque l'on fait la fusion, on se retrouve d'abord avec le
- * résultat de la fusion dans le buffer et on est ensuite obligé de copier
- * du buffer vers le tableau pour obtenir le résultat final dans le tableau.
+ * <p> Note : on fait la fusion dans le buffer, puis on recopie le résultat
+ * de la fusion dans le tableau d'origine. Cette copie peut être évitée
+ * en modifiant un peu la récursion.
+ * Voir {@link TriSequentiel} pour une Version qui utilise un unique buffer
+ * sans copies inutiles.
  * </p>
- * <p> pour éviter cette copie, on va diviser le tableau non pas en deux, mais
- * en quatre sous-parties : st1,st2,st3, et st4 de taille environ égales.
- * on trie chacune des sous-parties, puis on fusionne st1 et st2 dans le buffer
- * et également st3 et st4 dans le buffer. Le buffer contient alors deux sous
- * partie st1+2 et st3+4 triées. Il nous suffier alors de faire la fusion
- * de ses deux partie du buffer vers le tableau pour avoir le résultat final
- * du trie dans le tableau sans avoir fait de copies inutiles.
  * <p> algo :
  * <ul>
  *   <li> trie(t,min,max,t2) : trie le tableau t pour les élements {@code min <= i <= max} :
  *     <li> t2 est un tableau de taille {@code >= } t
- *     <li> {@code if (max-min) <  4}
+ *     <li> {@code if (max-min) >  0}
  *     <ul>
- *       <li> faire un trie à bulle de ses max trois éléments de t <li>
- *     </ul>
- *     <li> sinon </li>
- *     <ul>
- *       <li> {@code m2 <- (max + min) / 2 }</li>
- *       <li> {@code m1 <- (m2 + min) / 2 }</li>
- *       <li> {@code m3 <- (max + m2 + 1) / 2 }</li>
- *       <li> trie(t,min,m1,t2) </li>
- *       <li> trie(t,m1+1,m2,t2) </li>
- *       <li> trie(t,m2+1,m3,t2) </li>
- *       <li> trie(t,m3+1,max,t2) </li>
- *       <li> fusion(t,min,m2,t2) </li>
- *       <li> fusion(t,m2+1,max,t2) </li>
- *       <li> fusion(t2,min,max,t) </li>
+ *       <li> {@code milieu <- (max + min) / 2 }</li>
+ *       <li> trie(t,min,milieu,t2) </li>
+ *       <li> trie(t,milieu+1,max,t2) </li>
+ *       <li> fusion(t,min,max,t2) </li>
  *     </ul>
  *     </li>
  *   </li>
- *   <li> fusion(t,min,max,t2) :
+ *   <li> fusion(t,min,max,t2) : 
  *     <li> {@code milieu <- (max + min) / 2 }</li>
  *     <li> suppose que les élements {@code min <= i <= milieu} sont triés </li>
  *     <li> suppose que les élements {@code milieu < i <= max} sont triés </li>
  *     <li> fusionne les éléments {@code min <= i <= max} de t dans t2 </li>
+ *     <li> recopie les éléments {@code min <= i <= max} de t2 dans t (PAS SOUHAITABLE)</li>
  *   </li>
  * </ul>
  * </p>
@@ -69,7 +54,7 @@ package fr.insa.beuvron.cours.multiTache.exemplesCours.trie;
  *
  * @author francois
  */
-public class TriSequentiel {
+public class TriSequentielBufferUniqueMaisCopiesInutiles {
 
     /**
      * todoDoc.
@@ -86,15 +71,15 @@ public class TriSequentiel {
      * @param tab
      */
     public static void tri(int[] tab) {
-        tri(tab, new int[tab.length]);
+        tri(tab,new int[tab.length]);
     }
 
     /**
      *
      * @param tab
      */
-    public static void tri(int[] tab, int[] buf) {
-        triBorne(tab, 0, tab.length - 1, buf);
+    public static void tri(int[] tab,int[] buf) {
+        triBorne(tab, 0, tab.length - 1,buf);
     }
 
     /**
@@ -103,33 +88,18 @@ public class TriSequentiel {
      * @param min
      * @param max
      */
-    public static void triBorne(int[] tab, int min, int max, int[] buf) {
-        if (max - min < 3) {
-            for(int i = min ; i < max ; i ++) {
-                for(int j = i ; j <= max ; j ++) {
-                    if (tab[i] > tab[j]) {
-                        int temp = tab[i];
-                        tab[i] = tab[j];
-                        tab[j] = temp;
-                    }
-                }
-            }
-        } else {
-            int m2 = (max + min) / 2;
-            int m1 = (m2 + min) / 2;
-            int m3 = (max + m2 + 1) / 2;
-            triBorne(tab, min, m1, buf);
-            triBorne(tab, m1+1, m2, buf);
-            triBorne(tab, m2+1, m3, buf);
-            triBorne(tab, m3+1, max, buf);
-            fusion(tab, min, m2, buf);
-            fusion(tab, m2+1, max, buf);
-            fusion(buf, min, max, tab);
+    public static void triBorne(int[] tab, int min, int max,int[] buf) {
+//        System.out.println("sorting " + Arrays.toString(tab) + " between " + min + " and " + max);
+        if (max - min > 0) {
+            int milieu = (max + min) / 2;
+            triBorne(tab, min, milieu,buf);
+            triBorne(tab, milieu + 1, max,buf);
+            fusion(tab, min, max,buf);
         }
 //        System.out.println("sorted " + Arrays.toString(tab) + " between " + min + " and " + max);
     }
 
-    public static void fusion(int[] tab, int min, int max, int[] buf) {
+    private static void fusion(int[] tab, int min, int max,int[] buf) {
 //        int[] fu = new int[max - min + 1];
         int milieu = (max + min) / 2;
         int cur1 = min;
@@ -150,6 +120,9 @@ public class TriSequentiel {
                 buf[i] = tab[cur2];
                 cur2++;
             }
+        }
+        for (int i = min; i <= max; i++) {
+            tab[i] = buf[i];
         }
     }
 
@@ -188,13 +161,13 @@ public class TriSequentiel {
      * @param bmax
      */
     public static void test(int size, int bmax) {
-        int[] t = TriSequentiel.tabAlea(size, bmax);
+        int[] t = TriSequentielBufferUniqueMaisCopiesInutiles.tabAlea(size, bmax);
         System.out.println("trie tableau taille : " + size
                 + " (0 <= e < " + bmax + ")");
         long deb = System.currentTimeMillis();
         tri(t);
         long duree = System.currentTimeMillis() - deb;
-        System.out.println("test : " + TriSequentiel.testTrie(t));
+        System.out.println("test : " + TriSequentielBufferUniqueMaisCopiesInutiles.testTrie(t));
         System.out.println("in " + duree + " ms");
 
     }
@@ -204,7 +177,7 @@ public class TriSequentiel {
      * @param args
      */
     public static void main(String[] args) {
-        test(10000000, TriSequentiel.BMAX);
+        test(10000000, TriSequentielBufferUniqueMaisCopiesInutiles.BMAX);
     }
 
 }
