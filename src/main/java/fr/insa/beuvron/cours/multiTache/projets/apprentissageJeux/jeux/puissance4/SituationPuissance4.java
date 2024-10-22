@@ -187,6 +187,19 @@ public class SituationPuissance4 implements Situation{
         return res;
     }
 
+    @Override
+    public String toCSV() {
+        StringBuilder res = new StringBuilder();
+        for (int lig = 0 ; lig < 8 ; lig ++) {
+            for (int col = 0 ; col < 8 ; col ++) {
+                res.append(this.val(lig, col));
+                if (lig != 7 || col != 7) {
+                    res.append(",");
+                }
+            }
+        }
+        return res.toString();
+    }
     public SituationPuissance4 copie() {
         // je n'ai pas trouvé de fonction prédéfinie permettant de copier
         // une matrice d'entier en java ; Incroyable !!

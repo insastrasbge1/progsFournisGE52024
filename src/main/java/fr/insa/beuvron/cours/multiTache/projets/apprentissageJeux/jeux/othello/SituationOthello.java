@@ -18,7 +18,8 @@ along with CoursBeuvron.  If not, see <http://www.gnu.org/licenses/>.
  */
 package fr.insa.beuvron.cours.multiTache.projets.apprentissageJeux.jeux.othello;
 
-import fr.insa.beuvron.cours.jeux.othelloSimple.Damier;
+import fr.insa.beuvron.cours.jeux.othelloSimpleV2.Case;
+import fr.insa.beuvron.cours.jeux.othelloSimpleV2.Damier;
 import fr.insa.beuvron.cours.multiTache.projets.apprentissageJeux.apiJeux.Situation;
 
 /**
@@ -35,6 +36,29 @@ public class SituationOthello implements Situation {
 
     public Damier getDamierReel() {
         return damierReel;
+    }
+    
+    @Override
+    public String toCSV() {
+        StringBuilder res = new StringBuilder();
+        for (int lig = 0 ; lig < 8 ; lig ++) {
+            for (int col = 0 ; col < 8 ; col ++) {
+                Case cur = this.damierReel.getVal(lig, col);
+                int val;
+                if (cur ==  Case.VIDE) {
+                    val = 0;
+                } else if (cur == Case.NOIR) {
+                    val = 1;
+                } else {
+                    val = -1;
+                }
+                res.append(val);
+                if (lig != 7 || col != 7) {
+                    res.append(",");
+                }
+            }
+        }
+        return res.toString();
     }
 
     @Override

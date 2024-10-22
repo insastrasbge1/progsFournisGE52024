@@ -18,8 +18,8 @@ along with CoursBeuvron.  If not, see <http://www.gnu.org/licenses/>.
  */
 package fr.insa.beuvron.cours.multiTache.projets.apprentissageJeux.jeux.othello;
 
-import fr.insa.beuvron.cours.jeux.othelloSimple.Damier;
-import fr.insa.beuvron.cours.jeux.othelloSimple.Position;
+import fr.insa.beuvron.cours.jeux.othelloSimpleV2.Damier;
+import fr.insa.beuvron.cours.jeux.othelloSimpleV2.Position;
 import fr.insa.beuvron.cours.multiTache.projets.apprentissageJeux.apiJeux.Jeu;
 import fr.insa.beuvron.cours.multiTache.projets.apprentissageJeux.apiJeux.Joueur;
 import fr.insa.beuvron.cours.multiTache.projets.apprentissageJeux.apiJeux.StatutSituation;
@@ -27,7 +27,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
+ * Une classe "proxy" pour donner les fonctionnalités d'un Jeu (au sens de l'api)
+ * à une classe déjà existante {@link fr.insa.beuvron.cours.jeux.othelloSimpleV2.Damier}
+ * qui implémente effectivement le jeu d'Othello.
  * @author francois
  */
 public class JeuOthello implements Jeu<SituationOthello, CoupOthello> {
@@ -38,23 +40,7 @@ public class JeuOthello implements Jeu<SituationOthello, CoupOthello> {
         return new SituationOthello(res);
     }
 
-    /**
-     * la classe OthelloSimple n'a ni constructeur, ni encapsulation : ses
-     * attributs sont public ce qui n'est pas normal ; une petite méthode
-     * "proxy" qui sert de pseudo-constructeur.
-     *
-     * @param lig
-     * @param col
-     * @return
-     */
-    private static Position creePos(int lig, int col) {
-        Position res = new Position();
-        res.ligne = lig;
-        res.col = col;
-        return res;
-    }
-
-    /**
+   /**
      * La représentation d'un joueur n'est pas la même dans le jeux original
      * et dans l'api.
      * <p> une petite conversion s'impose</p>
@@ -65,11 +51,11 @@ public class JeuOthello implements Jeu<SituationOthello, CoupOthello> {
      * @param j un Joueur au sens de l'api apprentissage
      * @return un Joueur au sens du jeu original d'othello
      */
-    private fr.insa.beuvron.cours.jeux.othelloSimple.Joueur convNewJoueurOldJoueur(Joueur j) {
+    private fr.insa.beuvron.cours.jeux.othelloSimpleV2.Joueur convNewJoueurOldJoueur(Joueur j) {
         if (j == Joueur.J1) {
-            return fr.insa.beuvron.cours.jeux.othelloSimple.Joueur.noir();
+            return fr.insa.beuvron.cours.jeux.othelloSimpleV2.Joueur.NOIR;
         } else {
-            return fr.insa.beuvron.cours.jeux.othelloSimple.Joueur.blanc();
+            return fr.insa.beuvron.cours.jeux.othelloSimpleV2.Joueur.BLANC;
         }
 
     }
@@ -85,8 +71,8 @@ public class JeuOthello implements Jeu<SituationOthello, CoupOthello> {
      * @param oldJ un Joueur au sens du jeu original d'othello
      * @return un Joueur au sens de l'api apprentissage 
      */
-    private Joueur convOldJoueurNewJoueur(fr.insa.beuvron.cours.jeux.othelloSimple.Joueur oldJ) {
-        if (oldJ.estNoir()) {
+    private Joueur convOldJoueurNewJoueur(fr.insa.beuvron.cours.jeux.othelloSimpleV2.Joueur oldJ) {
+        if (oldJ == fr.insa.beuvron.cours.jeux.othelloSimpleV2.Joueur.NOIR) {
             return Joueur.J1;
         } else {
             return Joueur.J2;
@@ -95,29 +81,20 @@ public class JeuOthello implements Jeu<SituationOthello, CoupOthello> {
 
     /**
      * Test toutes les cases pour déterminier les coups jouables.
-     * <p> le jeu original permet de tester si un coup est jouable ou non, mais
-     * ne permet pas de renvoyer la liste de tous les coups jouables.
-     * </p>
      * @param s
      * @param j
      * @return 
      */
     @Override
     public List<CoupOthello> coupsJouables(SituationOthello s, Joueur j) {
-        List<CoupOthello> res = new ArrayList<>();
-        fr.insa.beuvron.cours.jeux.othelloSimple.Joueur jConv
+        fr.insa.beuvron.cours.jeux.othelloSimpleV2.Joueur jConv
                 = convNewJoueurOldJoueur(j);
-        for (int lig = 0; lig < 8; lig++) {
-            for (int col = 0; col < 8; col++) {
-                if (s.getDamierReel().jouable(creePos(lig, col), jConv)) {
-                    res.add(CoupOthello.coupNormal(lig, col));
-                }
-            }
+        List<Position> jouables = s.getDamierReel().coupsJouables(jConv);
+        if (jouables.isEmpty()) {
+            return List.of(CoupOthello.coupPasse());
+        } else {
+            return jouables.stream().map(CoupOthello::fromPos).toList();
         }
-        if (res.isEmpty()) {
-            res.add(CoupOthello.coupPasse());
-        }
-        return res;
     }
 
     @Override
@@ -126,7 +103,7 @@ public class JeuOthello implements Jeu<SituationOthello, CoupOthello> {
             return s;
         } else {
             SituationOthello res = new SituationOthello(s.getDamierReel().copie());
-            res.getDamierReel().effectueCoup(creePos(c.getLig(), c.getCol()), convNewJoueurOldJoueur(j));
+            res.getDamierReel().effectueCoup(new Position(c.getLig(), c.getCol()), convNewJoueurOldJoueur(j));
             return res;
         }
     }

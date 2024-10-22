@@ -24,4 +24,10 @@ package fr.insa.beuvron.cours.multiTache.projets.apprentissageJeux.apiJeux;
  */
 public interface Situation {
     
+    /**
+     * pour sauvegarder pour apprentissage.
+     * @return une ligne (sans retour à la ligne) séparée par des ','  
+     */
+    public String toCSV();
+    
 }

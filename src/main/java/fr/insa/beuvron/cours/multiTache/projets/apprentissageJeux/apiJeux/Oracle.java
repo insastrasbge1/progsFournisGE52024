@@ -18,6 +18,8 @@ along with CoursBeuvron.  If not, see <http://www.gnu.org/licenses/>.
  */
 package fr.insa.beuvron.cours.multiTache.projets.apprentissageJeux.apiJeux;
 
+import java.util.List;
+
 /**
  * Le stratège doit donner une évaluation d'une Situation pour un Joueur.
  * <p> Nous choisissons une évaluation numérique avec le sens "intuitif" :
@@ -63,26 +65,56 @@ package fr.insa.beuvron.cours.multiTache.projets.apprentissageJeux.apiJeux;
  * </p>
  * @author francois
  */
-public interface Oracle<Situation> {
+public interface Oracle<Sit extends Situation> {
     
     /**
      * renvoie une estimation de la probabilité de gagner connaissant une situation.
      * @param s
      * @return {@code 0 <= eval <=1}
      */
-    public double evalSituation(Situation s);
+    public double evalSituation(Sit s);
+    
     
     /**
-     * met à jour l'Oracle pour tenir compte que pour la situation s, l'évaluation
-     * devrait être evalSouhaitée.
-     * <p>
-     * Puisque nous avons en tête des Oracles définis par des réseaux de neurones,
-     * fournir une situation avec une eval souhaitée correspond à un nouvel
-     * élément d'apprentissage du réseau sous-jacent
+     * Retourne les joueurs compatibles avec l'oracle.
+     * <pre>
+     * <p> Un oracle peut être compatible avec le joueur J1, le joueur J2, ou
+     * les deux.
      * </p>
-     * @param s
-     * @param evalSouhaitee 
+     * <p> 
+     * Dans certains jeux, les situations peuvent être les mêmes que ce soit au
+     * joueur J1 ou au joueur J2 de jouer. Dans ce cas il est normal d'avoir un
+     * oracle qui sait aussi bien évaluer les situations quand c'est à J1 de jouer
+     * que les situations où c'est à J2 de jouer. Dans ce cas, il serait normal
+     * (mais non requis) que pour une situation s, 
+     * evalSituation(s) du point de vue de J1 = (1 - evalSituation(s)) du point de vue de J2
+     * </p>
+     * <p> dans d'autres jeux les situations que rencontrent les joueurs J1 et J2 sont
+     * toujours différentes : par exemple dans le jeu puissance 4, le joueur J1 voit 
+     * toujours des situations avec un nombre pair de pions sur le damier, alors que
+     * le joueur J2 voit toujours des damiers avec un nombre impair de pions. Dans
+     * ce cas il semble plus efficace d'entrainer séparément des oracles pour
+     * J1 et des oracles pour J2.
+     * </pre>
+     * @return 
      */
-    public void apprend(Situation s,double evalSouhaitee);
+    public List<Joueur> joueursCompatibles();
+    
+    /**
+     * L'oracle évalue les situations du point de vue de ce joueur.
+     * <pre>
+     * <p> Les classes implémentant Oracle doivent s'assurer que 
+ getEvalueSituationApresCoupDe toujours inclu dans joueursCompatibles
+ </p>
+     * </pre>
+     * @return 
+     */
+    public Joueur getEvalueSituationApresCoupDe();
+    
+    /**
+     * fixe le joueur du point de vue duquel l'oracle doit évaluer les situations.
+     * @param j 
+     */
+    public void setEvalueSituationApresCoupDe(Joueur j);
     
 }

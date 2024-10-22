@@ -16,7 +16,8 @@
  You should have received a copy of the GNU General Public License
  along with CoursBeuvron.  If not, see <http://www.gnu.org/licenses/>.
  */
-package fr.insa.beuvron.cours.jeux.othelloSimple;
+package fr.insa.beuvron.cours.jeux.othelloSimpleV2;
+
 
 /**
  * Title: micro othello Description: Création d'un petit programme d'othello. Ce
@@ -31,69 +32,24 @@ package fr.insa.beuvron.cours.jeux.othelloSimple;
  * choisi de coder la couleur du joeur par un entier (même code que {@link Case}
  * sans la possibilité de VIDE)
  */
-public class Joueur {
+public enum Joueur {
+    NOIR,BLANC;
 
-    /**
-     * utiliser les constantes {@link Case#NOIR} et {@link Case#BLANC} comme
-     * valeur de ce champ
-     */
-    public int couleur;
-    /**
-     * vrai si ce joueur est joué par l'ordinateur
-     */
-    public boolean ordinateur;
 
-    /**
-     * retourne systématiquement un nouveau joueur NOIR
-     * 
-     */
-    public static Joueur noir() {
-        Joueur res = new Joueur();
-        res.couleur = Case.NOIR;
-        return res;
+    public Case toCase() {
+        if (this == NOIR) {
+            return Case.NOIR;
+        } else {
+            return Case.BLANC;
+        }
     }
-
-    /**
-     * retourne systématiquement un nouveau joueur BLANC
-     * 
-     */
-    public static Joueur blanc() {
-        Joueur res = new Joueur();
-        res.couleur = Case.BLANC;
-        return res;
-    }
-
-    /**
-     *
-     * 
-     */
+    
     public Joueur adversaire() {
-        Joueur res = new Joueur();
-        if (this.couleur == Case.NOIR) {
-            res.couleur = Case.BLANC;
+        if (this == NOIR) {
+            return BLANC;
         } else {
-            res.couleur = Case.NOIR;
-        }
-        return res;
-    }
-
-    /**
-     *
-     * 
-     */
-    public boolean estNoir() {
-        return this.couleur == Case.NOIR;
-    }
-
-    /**
-     *
-     * 
-     */
-    public String toString() {
-        if (this.couleur == Case.NOIR) {
-            return "[Joeur Noir]";
-        } else {
-            return "[Joeur Blanc]";
+            return NOIR;
         }
     }
+
 }

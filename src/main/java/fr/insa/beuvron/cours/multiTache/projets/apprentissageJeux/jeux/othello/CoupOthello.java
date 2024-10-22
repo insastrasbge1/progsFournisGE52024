@@ -18,11 +18,17 @@ along with CoursBeuvron.  If not, see <http://www.gnu.org/licenses/>.
  */
 package fr.insa.beuvron.cours.multiTache.projets.apprentissageJeux.jeux.othello;
 
+import fr.insa.beuvron.cours.jeux.othelloSimpleV2.Position;
 import fr.insa.beuvron.cours.multiTache.projets.apprentissageJeux.apiJeux.Coup;
 import java.util.Optional;
 
 /**
  * un coup à l'Othello : un ligne,colonne, ou passe.
+ * <pre>
+ * <p>
+ * classe "proxy" pour la classe {@link fr.insa.beuvron.cours.jeux.othelloSimpleV2.Position}
+ * </p>
+ * </pre>
  *
  * @author francois
  */
@@ -36,6 +42,10 @@ public class CoupOthello implements Coup {
 
     private CoupOthello(int lig, int col) {
         this.pos = Optional.of(new int[]{lig, col});
+    }
+    
+    public static CoupOthello fromPos(Position p) {
+        return new CoupOthello(p.getLigne(), p.getCol());
     }
 
     public static CoupOthello coupPasse() {

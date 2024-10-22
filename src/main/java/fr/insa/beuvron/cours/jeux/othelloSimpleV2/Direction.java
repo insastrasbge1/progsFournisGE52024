@@ -16,7 +16,8 @@
  You should have received a copy of the GNU General Public License
  along with CoursBeuvron.  If not, see <http://www.gnu.org/licenses/>.
  */
-package fr.insa.beuvron.cours.jeux.othelloSimple;
+package fr.insa.beuvron.cours.jeux.othelloSimpleV2;
+
 
 /**
  * Title: micro othello Description: Création d'un petit programme d'othello. Ce
@@ -33,17 +34,22 @@ package fr.insa.beuvron.cours.jeux.othelloSimple;
 public class Direction {
 
     /** todoDoc. */
-    public int dligne;
+    private int dligne;
 
     /** todoDoc. */
-    public int dcol;
+    private int dcol;
+
+    public Direction(int dligne, int dcol) {
+        this.dligne = dligne;
+        this.dcol = dcol;
+    }
 
     /**
      *
      * 
      */
     public String toString() {
-        return "[Direction (" + this.dligne + "," + this.dcol + ")]";
+        return "[Direction (" + this.getDligne() + "," + this.getDcol() + ")]";
     }
 
     /**
@@ -52,6 +58,20 @@ public class Direction {
      * 
      */
     public boolean estValide() {
-        return dligne != 0 || dcol != 0;
+        return getDligne() != 0 || getDcol() != 0;
+    }
+
+    /**
+     * @return the dligne
+     */
+    public int getDligne() {
+        return dligne;
+    }
+
+    /**
+     * @return the dcol
+     */
+    public int getDcol() {
+        return dcol;
     }
 }

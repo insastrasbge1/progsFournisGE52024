@@ -18,6 +18,11 @@ along with CoursBeuvron.  If not, see <http://www.gnu.org/licenses/>.
  */
 package fr.insa.beuvron.cours.multiTache.projets.apprentissageJeux.jeux.puissance4;
 
+import fr.insa.beuvron.cours.multiTache.projets.apprentissageJeux.apiJeux.ChoixCoup;
+import fr.insa.beuvron.cours.multiTache.projets.apprentissageJeux.apiJeux.Joueur;
+import fr.insa.beuvron.cours.multiTache.projets.apprentissageJeux.apiJeux.OracleStupide;
+import java.util.Random;
+
 /**
  *
  * @author francois
@@ -26,15 +31,19 @@ public class TestsPuissance4 {
 
     public static void testStupid() {
         JeuPuissance4 jt = new JeuPuissance4();
-        jt.partie(new OracleStupidePuissance4(), new OracleStupidePuissance4(),
-                false, false, true);
+        jt.partie(
+                new OracleStupide<SituationPuissance4>(Joueur.J1), ChoixCoup.ALEA,
+                new OracleStupide<SituationPuissance4>(Joueur.J2), ChoixCoup.ALEA,
+                false, false,new Random(), true);
 
     }
 
     public static void testHvsH() {
         JeuPuissance4 jt = new JeuPuissance4();
-        jt.partie(new OracleStupidePuissance4(), new OracleStupidePuissance4(),
-                true, true, true);
+        jt.partie(
+                new OracleStupide<SituationPuissance4>(Joueur.J1), ChoixCoup.ALEA,
+                new OracleStupide<SituationPuissance4>(Joueur.J2), ChoixCoup.ALEA,
+                true, true,new Random(), true);
 
     }
 

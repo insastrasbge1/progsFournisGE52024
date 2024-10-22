@@ -18,6 +18,11 @@ along with CoursBeuvron.  If not, see <http://www.gnu.org/licenses/>.
  */
 package fr.insa.beuvron.cours.multiTache.projets.apprentissageJeux.jeux.othello;
 
+import fr.insa.beuvron.cours.multiTache.projets.apprentissageJeux.apiJeux.ChoixCoup;
+import fr.insa.beuvron.cours.multiTache.projets.apprentissageJeux.apiJeux.Joueur;
+import fr.insa.beuvron.cours.multiTache.projets.apprentissageJeux.apiJeux.OracleStupide;
+import java.util.Random;
+
 /**
  *
  * @author francois
@@ -26,8 +31,9 @@ public class TestsOthello {
 
     public static void testStupid() {
         JeuOthello jt = new JeuOthello();
-        jt.partie(new OracleStupideOthello(), new OracleStupideOthello(),
-                false, false, true);
+        jt.partie(new OracleStupide<SituationOthello>(Joueur.J1),ChoixCoup.ALEA,
+                new OracleStupide<SituationOthello>(Joueur.J2),ChoixCoup.ALEA,
+                false, false,new Random(), true);
 
     }
 

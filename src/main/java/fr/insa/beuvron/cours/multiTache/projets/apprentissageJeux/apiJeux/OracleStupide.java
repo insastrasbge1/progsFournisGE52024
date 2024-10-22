@@ -16,24 +16,26 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with CoursBeuvron.  If not, see <http://www.gnu.org/licenses/>.
  */
-package fr.insa.beuvron.cours.multiTache.projets.apprentissageJeux.jeux.puissance4;
+package fr.insa.beuvron.cours.multiTache.projets.apprentissageJeux.apiJeux;
 
-import fr.insa.beuvron.cours.multiTache.projets.apprentissageJeux.apiJeux.Oracle;
+import java.util.List;
 
 /**
  *
  * @author francois
  */
-public class OracleStupidePuissance4 implements Oracle<SituationPuissance4> {
+public class OracleStupide<Sit extends Situation> extends  AbstractOracle<Sit>{
+    
+    private Joueur evaluePour;
+    
+    public OracleStupide(Joueur evaluePour) {
+        super(List.of(Joueur.J1,Joueur.J2), evaluePour);
+        this.evaluePour = evaluePour;
+    }
 
     @Override
-    public double evalSituation(SituationPuissance4 s) {
+    public double evalSituation(Situation s) {
         return 0.5;
-    }
-
-    @Override
-    public void apprend(SituationPuissance4 s, double evalSouhaitee) {
-        // n'apprend rien
-    }
+   }
     
 }
