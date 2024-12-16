@@ -162,6 +162,7 @@ public interface Jeu<Sit extends Situation, Co extends Coup> {
                 System.out.println(curSit);
             }
             Oracle<Sit> curOracle = oracles.get(numJoueur);
+            Oracle<Sit> oracleAdversaire = oracles.get(1-numJoueur);
             ChoixCoup curCC = ccs.get(numJoueur);
             Joueur curJoueur = joueurs.get(numJoueur);
             boolean humain = humains.get(numJoueur);
@@ -179,27 +180,36 @@ public interface Jeu<Sit extends Situation, Co extends Coup> {
                     // je demande au stratege courant d'évaluer les coups jouables
                     // pour cela, je joue effectivement les coups, je calcule la
                     // nouvelle situation, et je demande à l'oracle ADVERSE de l'évaluer
+                    // !!! ICI MODIF 20241204 : la version précédente était doublement fautive car elle
+                    // !!!   . utilisait l'oracle du joueur courant et non l'oracle de l'adversaire
+                    // !!!   . prenait l'évaluation de l'adversaire
+                    // !!!       ==> il faut prendre eval joueur courant = 1 - eval joueur adversaire
                     List<Double> evals = new ArrayList<>();
                     for (Co c : possibles) {
                         Sit nouvelle = this.updateSituation(curSit, curJoueur, c);
-                        evals.add(curOracle.evalSituation(nouvelle));
+                        evals.add(1-oracleAdversaire.evalSituation(nouvelle));
                     }
                     if (curCC == ChoixCoup.ORACLE_MEILLEUR) {
-                        // on prend le coup correspondant au MIN des évaluation
+                        // !!! ICI MODIF 20241204 :
+                        // !!! l'eval est maintenant par rapport au joueur courant
+                        // !!! puisque l'on a pris 1-eval adversaire
+                        // on prend donc maintenant le coup correspondant au MAX des évaluations
                         // car on a fait faire l'évaluation à l'adversaire
                         // je prend donc le coup qui amène à la situation la
                         // moins favorable pour l'adversaire
-                        int imin = 0;
-                        double min = evals.get(imin);
+                        int imax = 0;
+                        double max = evals.get(imax);
                         for (int i = 1; i < evals.size(); i++) {
-                            if (evals.get(i) < min) {
-                                imin = i;
-                                min = evals.get(imin);
+                            if (evals.get(i) > max) {
+                                imax = i;
+                                max = evals.get(imax);
                             }
                         }
-                        coupChoisi = possibles.get(imin);
+                        coupChoisi = possibles.get(imax);
                     } else {
                         // curCC == ChoixCoup.ORACLE_PONDERE
+                        // MODIF 20241204 : maintenant l'eval est bien du point de vue du joueur courant
+                        //   le choix pondéré est donc correct (alors qu'il était fautif avant modif)
                         coupChoisi = TiragesAlea2.choixAleaPondere(possibles, evals, rand);
                     }
                 }
